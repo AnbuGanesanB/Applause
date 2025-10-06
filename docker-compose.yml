@@ -1,0 +1,113 @@
+services:
+
+  employee-db:
+    container_name: ms_employee_db
+    image: postgres:${POSTGRES_VERSION}
+    environment:
+      POSTGRES_DB: ${EMPLOYEE_DB}
+      POSTGRES_USER: ${EMPLOYEE_DB_USER}
+      POSTGRES_PASSWORD: ${EMPLOYEE_DB_PASSWORD}
+    volumes:
+      - employee_postgres:/var/lib/postgresql/data
+    ports:
+      - "${EMPLOYEE_DB_PORT}:5432"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: ms_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "${PGADMIN_PORT}:80"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  keycloak-db:
+    image: postgres:${POSTGRES_VERSION}
+    container_name: ms_keycloak_db
+    environment:
+      POSTGRES_DB: ${KEYCLOAK_DB}
+      POSTGRES_USER: ${KEYCLOAK_DB_USER}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    ports:
+      - "${KEYCLOAK_DB_PORT}:5432"
+    volumes:
+      - keycloak_postgres:/var/lib/postgresql/data
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  keycloak:
+    container_name: ms_keycloak
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
+    command: ${KEYCLOAK_START_COMMAND}
+    environment:
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak-db
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    ports:
+      - "${KEYCLOAK_PORT}:8080"
+    networks:
+      - microservices-net
+    depends_on:
+      - keycloak-db
+    restart: unless-stopped
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:2181"
+    networks:
+      - microservices-net
+
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: ms_kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+    networks:
+      - microservices-net
+
+  mail-dev:
+    container_name: ms-mail-dev
+    image: maildev/maildev
+    ports:
+      - 1080:1080
+      - 1025:1025
+
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  employee_postgres:
+  pgadmin:
+  keycloak_postgres:

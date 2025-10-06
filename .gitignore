@@ -1,0 +1,28 @@
+# Ignore environment variable files
+.env
+*.env
+
+# Ignore local config repo with secrets
+/config-repo/
+
+# Ignore IntelliJ / JetBrains IDE files
+.idea/
+
+# Ignore build artifacts
+**/target/
+**/build/
+
+# Ignore logs
+*.log
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore temporary files
+*.swp
+*.tmp
+
+# Docker volumes or persistent data
+volumes/
+data/

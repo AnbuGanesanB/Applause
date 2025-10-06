@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Notification</title>
+    <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: #ffffff;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #333333;
+    }
+
+    p {
+      font-size: 16px;
+      color: #555555;
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #999999;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+    <h2 th:text="'Hello, ' + ${EmpName}">Hello, EmpName</h2>
+
+    <p>
+        We wanted to notify you that your registered email is:
+        <strong th:text="${Email}">email@example.com</strong>.
+    </p>
+
+    <p>If this is incorrect or you have any concerns, please contact support.</p>
+
+    <div class="footer">
+        &copy; 2025 Your Company. All rights reserved.
+    </div>
+</div>
+</body>
+</html>

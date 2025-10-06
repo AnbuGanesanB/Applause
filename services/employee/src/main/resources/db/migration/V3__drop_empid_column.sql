@@ -1,0 +1,1 @@
+alter table employee drop emp_id;
