@@ -1,23 +1,26 @@
 package com.example.employee.controller;
 
 import com.example.employee.dtos.NewUser;
+import com.example.employee.model.employee.Employee;
+import com.example.employee.model.employee.EmployeeDto;
 import com.example.employee.service.EmployeeService;
-import lombok.AllArgsConstructor;
+import com.example.employee.service.EntityRetrieve;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
+import static com.example.employee.ApiConstant.API_VERSION;
+
 @RestController
 @RequiredArgsConstructor
+@RequestMapping(API_VERSION)
 public class EmployeeController {
 
     private final EmployeeService employeeService;
+    private final EntityRetrieve entityRetrieve;
 
     @GetMapping("/public/1")
     public String getPublicHome(){
@@ -35,17 +38,18 @@ public class EmployeeController {
         return "Manager - Reached Home !!";
     }
 
-    @PreAuthorize("hasRole('hr')")
-    @GetMapping("/users")
-    public List<Map<String, Object>> getKeycloakUsers(){
-        return null;/*employeeService.getAllUsers();*/
+    @GetMapping("/send")
+    public String sendMessage(){
+        employeeService.sendKafkaMessage();
+        return "Message sent";
     }
 
-    @PreAuthorize("hasRole('hr')")
-    @PostMapping("/users")
-    public void addNewUser(@RequestBody NewUser newUser){
-        employeeService.createUser(newUser);
-    }
+    /*@GetMapping("/users")
+    public List<Map<String, Object>> getKeycloakUsers(){
+        return null;*//*employeeService.getAllUsers();*//*
+    }*/
+
+    //****************************************************
 
     @PreAuthorize("hasRole('hr')")
     @GetMapping("/sync")
@@ -53,9 +57,31 @@ public class EmployeeController {
         employeeService.syncUsersFromKeycloak();
     }
 
-    @GetMapping("/send")
-    public String sendMessage(){
-        employeeService.sendKafkaMessage();
-        return "Message sent";
+    @GetMapping("/employees")
+    public List<EmployeeDto> getAllEmployeeDetails(){
+        return employeeService.getAllEmployeeDetails();
     }
+
+    @GetMapping("/employees/{employeeId}")
+    public EmployeeDto getEmployeeDetails(@PathVariable("employeeId") int employeeId){
+        Employee employee = entityRetrieve.getEmployeeById(employeeId);
+        return employeeService.getEmployeeDetails(employee);
+    }
+
+    //@PreAuthorize("hasRole('hr')")
+    @PostMapping("/employees")
+    public EmployeeDto addNewUser(@RequestBody NewUser newUser){
+        Employee employee = employeeService.createUser(newUser);
+        return employeeService.getEmployeeDetails(employee);
+    }
+
+    @PatchMapping("/employees/department")
+    public EmployeeDto updateDepartment(@RequestBody Map<String, Object> requestData){
+        int employeeId = (Integer) requestData.getOrDefault("employeeId",0);
+        int departmentId = (Integer) requestData.getOrDefault("departmentId",0);
+
+        Employee employee = employeeService.updateDepartment(employeeId,departmentId);
+        return employeeService.getEmployeeDetails(employee);
+    }
+
 }
