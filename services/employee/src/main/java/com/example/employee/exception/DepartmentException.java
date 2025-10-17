@@ -1,0 +1,40 @@
+package com.example.employee.exception;
+
+public class DepartmentException {
+
+    public static class DepartmentNotFoundException extends RuntimeException{
+        public DepartmentNotFoundException(String message){super(message);}
+    }
+
+
+
+    public static class DuplicateRecordException extends RuntimeException{
+        public DuplicateRecordException(String message){
+            super(message);
+        }
+    }
+
+    public static class ProjectAlreadyExistsException extends RuntimeException{
+        public ProjectAlreadyExistsException(String message){
+            super(message);
+        }
+    }
+
+    public static class UserNotFoundException extends RuntimeException{
+        public UserNotFoundException(String message){
+            super(message);
+        }
+    }
+
+    public static class EmployeeNotSuitableException extends RuntimeException{
+        public EmployeeNotSuitableException(String message){
+            super(message);
+        }
+    }
+
+    public static class InvalidInputException extends RuntimeException{
+        public InvalidInputException(String message){
+            super(message);
+        }
+    }
+}

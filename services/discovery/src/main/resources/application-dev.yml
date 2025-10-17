@@ -1,0 +1,15 @@
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+spring:
+  cloud:
+    config:
+      enabled: false
+      override-system-properties: false
+server:
+  port: 8761
