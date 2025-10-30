@@ -17,6 +17,7 @@ public class EmployeeDtoMapper {
         employeeDto.setEmpName(employee.getEmpName());
         employeeDto.setFirstName(employee.getFirstName());
         employeeDto.setLastName(employee.getLastName());
+        employeeDto.setEmpUuid(employee.getUuid());
 
         Department department = employee.getDepartment();
         if(department!=null){

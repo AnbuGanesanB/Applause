@@ -16,10 +16,9 @@ public class EmployeeDto {
     private String empName;
     private String firstName;
     private String lastName;
+    private String empUuid;
     private Map<String, String> department;
     private List<Map<String,String>> teams;
     private List<Map<String,String>> teamsLed;
     private List<Map<String,String>> departmentsManaged;
-    /*private int deptId;
-    private String deptName;*/
 }
