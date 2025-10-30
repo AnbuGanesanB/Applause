@@ -26,7 +26,8 @@ public class DepartmentDtoMapper {
 
     private Map<String,String> getManagerDetails(Employee manager){
         Map<String,String> managerDetails = new HashMap<>();
-        managerDetails.put("ManagerId",manager.getId().toString());
+        managerDetails.put("Manager Id",manager.getId().toString());
+        managerDetails.put("Manager Uuid",manager.getUuid());
         managerDetails.put("Manager Name",manager.getEmpName());
         return managerDetails;
     }
@@ -34,7 +35,8 @@ public class DepartmentDtoMapper {
     private Map<String,String> getDepartmentMemberDetails(Employee employee){
         Map<String,String> member = new HashMap<>();
         member.put("Member Id",employee.getId().toString());
-        member.put("Name",employee.getEmpName());
+        member.put("Member Uuid", employee.getUuid());
+        member.put("Member Name",employee.getEmpName());
         return member;
     }
 }

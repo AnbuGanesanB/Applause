@@ -15,6 +15,21 @@ services:
       - microservices-net
     restart: unless-stopped
 
+  award-db:
+    container_name: ms_award_db
+    image: postgres:${POSTGRES_VERSION}
+    environment:
+      POSTGRES_DB: ${AWARD_DB}
+      POSTGRES_USER: ${AWARD_DB_USER}
+      POSTGRES_PASSWORD: ${AWARD_DB_PASSWORD}
+    volumes:
+      - award_postgres:/var/lib/postgresql/data
+    ports:
+      - "${AWARD_DB_PORT}:5432"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
   pgadmin:
     container_name: ms_pgadmin
     image: dpage/pgadmin4
@@ -109,5 +124,6 @@ networks:
 
 volumes:
   employee_postgres:
+  award_postgres:
   pgadmin:
   keycloak_postgres:

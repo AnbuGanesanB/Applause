@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: award-service
+  profiles:
+    active:
+      - dev

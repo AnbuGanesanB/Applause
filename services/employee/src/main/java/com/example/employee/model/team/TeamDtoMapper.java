@@ -24,6 +24,7 @@ public class TeamDtoMapper {
     private Map<String,String> getTLDetails(Employee teamLead){
         Map<String,String> tlDetails = new HashMap<>();
         tlDetails.put("Team Lead Id",teamLead.getId().toString());
+        tlDetails.put("Team Lead Uuid",teamLead.getUuid());
         tlDetails.put("Team Lead Name",teamLead.getEmpName());
         return tlDetails;
     }
@@ -31,7 +32,8 @@ public class TeamDtoMapper {
     private Map<String,String> getMemberDetails(Employee member){
         Map<String,String> memberDetails = new HashMap<>();
         memberDetails.put("Member Id",member.getId().toString());
-        memberDetails.put("Name",member.getEmpName());
+        memberDetails.put("Member Uuid", member.getUuid());
+        memberDetails.put("Member Name",member.getEmpName());
         return memberDetails;
     }
 }
