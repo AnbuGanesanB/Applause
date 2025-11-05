@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: goody-service
+  profiles:
+    active:
+      - dev

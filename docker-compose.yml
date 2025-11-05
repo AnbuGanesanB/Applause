@@ -30,6 +30,21 @@ services:
       - microservices-net
     restart: unless-stopped
 
+  goody-db:
+    container_name: ms_goody_db
+    image: postgres:${POSTGRES_VERSION}
+    environment:
+      POSTGRES_DB: ${GOODY_DB}
+      POSTGRES_USER: ${GOODY_DB_USER}
+      POSTGRES_PASSWORD: ${GOODY_DB_PASSWORD}
+    volumes:
+      - goody_postgres:/var/lib/postgresql/data
+    ports:
+      - "${GOODY_DB_PORT}:5432"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
   pgadmin:
     container_name: ms_pgadmin
     image: dpage/pgadmin4
@@ -125,5 +140,6 @@ networks:
 volumes:
   employee_postgres:
   award_postgres:
+  goody_postgres:
   pgadmin:
   keycloak_postgres:

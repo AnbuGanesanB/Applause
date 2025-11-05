@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.example.employee.ApiConstant.API_VERSION;
@@ -81,6 +82,14 @@ public class EmployeeService {
 
     public EmployeeDto getEmployeeDetails(Employee employee){
         return employeeDtoMapper.getEmployeeDetails(employee);
+    }
+
+    public Employee getEmployeeDetails(String empUuid){
+        Optional<Employee> optionalEmployee = employeeRepo.findByUuid(empUuid);
+        if(optionalEmployee.isPresent()){
+            return optionalEmployee.orElse(null);
+        }
+        return null;
     }
 
     public List<EmployeeDto> getAllEmployeeDetails(){
