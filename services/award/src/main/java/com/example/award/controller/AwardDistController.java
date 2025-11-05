@@ -50,4 +50,15 @@ public class AwardDistController {
         return awardDistService.getUserAwards(empId);
     }
 
+    /**
+     * returns total points of querying user
+     * @param jwt
+     * @return
+     */
+    @GetMapping("/award/mypoints")
+    public int getTotalPoints(@AuthenticationPrincipal Jwt jwt){
+        String userUuid = jwt.getClaim("sub").toString();
+        return awardDistService.getUserPoints(userUuid);
+    }
+
 }

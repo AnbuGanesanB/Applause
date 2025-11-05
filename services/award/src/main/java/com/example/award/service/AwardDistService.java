@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -125,4 +126,9 @@ public class AwardDistService {
     public List<AwardDistribution> getUserAwards(int empId) {
         return awardDistRepo.findByEmployeeId(empId);
     }
+
+    public int getUserPoints(String userUuid) {
+        return Optional.ofNullable(awardDistRepo.findTotalPointsByEmpUuidNative(userUuid)).orElse(0);
+    }
+
 }

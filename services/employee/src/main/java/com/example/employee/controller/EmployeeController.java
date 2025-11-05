@@ -62,9 +62,15 @@ public class EmployeeController {
         return employeeService.getAllEmployeeDetails();
     }
 
-    @GetMapping("/employees/{employeeId}")
+    @GetMapping("/employees/id/{employeeId}")
     public EmployeeDto getEmployeeDetails(@PathVariable("employeeId") int employeeId){
         Employee employee = entityRetrieve.getEmployeeById(employeeId);
+        return employeeService.getEmployeeDetails(employee);
+    }
+
+    @GetMapping("/employees/uuid/{empUuid}")
+    public EmployeeDto getEmployeeDetails(@PathVariable("empUuid") String empUuid){
+        Employee employee = employeeService.getEmployeeDetails(empUuid);
         return employeeService.getEmployeeDetails(employee);
     }
 
