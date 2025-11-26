@@ -1,7 +1,7 @@
 package com.example.employee.kafka;
 
+import com.example.employee.dtos.EmpInfo;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;

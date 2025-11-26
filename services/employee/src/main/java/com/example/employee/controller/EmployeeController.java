@@ -22,35 +22,6 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final EntityRetrieve entityRetrieve;
 
-    @GetMapping("/public/1")
-    public String getPublicHome(){
-        return "Public - Reached Home !!";
-    }
-
-    @GetMapping("/admin/1")
-    public String getAdminHome(){
-        return "Admin - Reached Home !!";
-    }
-
-    @PreAuthorize("hasRole('manager')")
-    @GetMapping("/manager/1")
-    public String getManagerHome(){
-        return "Manager - Reached Home !!";
-    }
-
-    @GetMapping("/send")
-    public String sendMessage(){
-        employeeService.sendKafkaMessage();
-        return "Message sent";
-    }
-
-    /*@GetMapping("/users")
-    public List<Map<String, Object>> getKeycloakUsers(){
-        return null;*//*employeeService.getAllUsers();*//*
-    }*/
-
-    //****************************************************
-
     @PreAuthorize("hasRole('hr')")
     @GetMapping("/sync")
     public void syncUsersFromKeycloak(){

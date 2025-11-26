@@ -133,6 +133,20 @@ services:
       - 1080:1080
       - 1025:1025
 
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka_ui
+    ports:
+      - "8081:8080"    # Keycloak uses 8080, so Kafka-UI on 8081
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=ms_kafka:9092
+    networks:
+      - microservices-net
+    depends_on:
+      - kafka
+
+
 networks:
   microservices-net:
     driver: bridge

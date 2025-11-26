@@ -11,6 +11,6 @@ public class KafkaEmpTopicConfig {
 
     @Bean
     public NewTopic employeeAdded(){
-        return TopicBuilder.name("Emp-Comm").build();
+        return TopicBuilder.name("employee-events").build();
     }
 }

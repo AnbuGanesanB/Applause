@@ -17,6 +17,7 @@ public class EmployeeDto {
     private String firstName;
     private String lastName;
     private String empUuid;
+    private String email;
     private Map<String, String> department;
     private List<Map<String,String>> teams;
     private List<Map<String,String>> teamsLed;

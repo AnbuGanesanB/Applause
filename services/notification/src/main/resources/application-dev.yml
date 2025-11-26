@@ -1,0 +1,54 @@
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  cloud:
+    config:
+      enabled: false
+      override-system-properties: false
+  security:
+    oauth2:
+      client:
+        registration:
+          employee-service:
+            client-id: notification-service
+            client-secret: cMTk229ZsoZGlaRZC0EJmYiMX9xOTckq
+            authorization-grant-type: client_credentials
+            provider: keycloak
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/Realm_Study
+#  kafka:
+#    consumer:
+#      bootstrap-servers: localhost:9092
+#      group-id: notificationGroupV3
+#      auto-offset-reset: latest
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+#      properties:
+#        spring.json.trusted.packages: "*"
+#        spring.json.use.type.headers: true
+#        spring.json.type.mapping: orderDeliveredEvent:com.example.applause.kafka.OrderDeliveredEvent,orderCancelledEvent:com.example.applause.kafka.OrderCancelledEvent,goodyOrderedEvent:com.example.applause.kafka.GoodyOrderedEvent
+#
+  mail:
+    host: localhost
+    port: 1025
+    username: anbu
+    password: anbu
+    properties:
+      mail:
+      smtp:
+      trust: "*"
+      auth: true
+      starttls:
+      enabled: true
+      connectiontimeout: 5000
+      timeout: 3000
+      writetimeout: 5000
+
+server:
+  port: 8040
