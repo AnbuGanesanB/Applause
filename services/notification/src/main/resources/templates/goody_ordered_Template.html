@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Goody Order Confirmation</title>
+
+  <style>
+    body { margin:0; padding:0; font-family: Arial, Helvetica, sans-serif; background:#f4f4f4; }
+    .container { width:100%; padding:20px 0; }
+    .card { max-width:600px; margin:0 auto; background:#ffffff; border-radius:6px; overflow:hidden; }
+    .header { padding:18px 24px; background:#0b66c3; color:#ffffff; }
+    .header h1 { margin:0; font-size:18px; font-weight:600; }
+    .body { padding:24px; color:#333; font-size:15px; line-height:1.5; }
+    .info-box { border:1px solid #e6e6e6; border-radius:6px; padding:16px; background:#fafafa; margin-top:16px; }
+    .label { font-size:12px; color:#777; margin-bottom:4px; display:block; }
+    .value { font-size:16px; font-weight:600; color:#0b66c3; }
+    .footer { padding:16px 24px; font-size:12px; color:#999; text-align:center; }
+  </style>
+</head>
+
+<body>
+<!-- Expected variables:
+     ${name}
+     ${goodyName}
+     ${quantity}
+     ${orderTime}
+-->
+
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" class="container">
+  <tr>
+    <td align="center">
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" class="card">
+
+        <tr>
+          <td class="header">
+            <h1>Company Name</h1>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="body">
+
+            <p>Hi <span th:text="${name}">Employee Name</span>,</p>
+
+            <p>
+              Your Goody order of
+              <strong><span th:text="${goody.name}">Goody Name</span></strong>
+              of quantity
+              <strong><span th:text="${goody.quantity}">1</span></strong>
+              has been received at
+              <strong><span th:text="${goody.orderTime}">Time</span></strong>.
+            </p>
+
+            <p>Thanks.</p>
+
+            <div class="info-box">
+              <span class="label">Goody</span>
+              <div class="value" th:text="${goody.name}">Goody Name</div>
+
+              <span class="label">Quantity</span>
+              <div class="value" th:text="${goody.quantity}">1</div>
+
+              <span class="label">Order Time</span>
+              <div class="value" th:text="${goody.orderTime}">Time</div>
+            </div>
+
+          </td>
+        </tr>
+
+        <tr>
+          <td class="footer">
+            Company Name<br/>
+            Company Address<br/>
+            Automated notification. Do not reply.
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

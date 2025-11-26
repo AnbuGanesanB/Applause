@@ -49,7 +49,7 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.type.mapping: empInfo:com.example.award.dto.EmpInfo
+        spring.json.add.type.headers: true
 
 server:
   port: 8060

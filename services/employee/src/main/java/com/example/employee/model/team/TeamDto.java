@@ -1,11 +1,11 @@
 package com.example.employee.model.team;
 
+import com.example.employee.dtos.EmpInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -14,6 +14,6 @@ public class TeamDto {
 
     private int teamId;
     private String teamName;
-    private Map<String,String> teamLeadDetails;
-    private List<Map<String,String>> teamMemberDetails;
+    private EmpInfo teamLeadDetails;
+    private List<EmpInfo> teamMemberDetails;
 }

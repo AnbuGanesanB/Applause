@@ -1,6 +1,5 @@
 package com.example.employee.service;
 import com.example.employee.dtos.NewUser;
-import com.example.employee.kafka.EmpInfo;
 import com.example.employee.kafka.EmployeeProducer;
 
 import com.example.employee.model.department.Department;
@@ -41,13 +40,13 @@ public class EmployeeService {
     private Employee addEmployeeFromKeycloak(UserRepresentation userRepresentation){
         Employee employee = new Employee();
         employee.setUuid(userRepresentation.getId());
-        System.out.println("Processing user: "+userRepresentation.getUsername());
 
         if(employeeRepo.exists(Example.of(employee))) return null;
 
         employee.setFirstName(userRepresentation.getFirstName());
         employee.setLastName(userRepresentation.getLastName());
         employee.setEmpName(userRepresentation.getUsername());
+        employee.setEmail(userRepresentation.getEmail());
 
         return employeeRepo.save(employee);
     }
@@ -73,11 +72,6 @@ public class EmployeeService {
         for (UserRepresentation userRepresentation: currentUsers){
             addEmployeeFromKeycloak(userRepresentation);
         }
-    }
-
-    public void sendKafkaMessage(){
-        employeeProducer.sendEmpData(new EmpInfo("Username","fName","lName","email"));
-        System.out.println("Service method completed");
     }
 
     public EmployeeDto getEmployeeDetails(Employee employee){

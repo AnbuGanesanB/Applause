@@ -31,12 +31,4 @@ public class Department {
     @ManyToOne
     @JoinColumn(name="manager")
     private Employee manager;
-
-    //id,name,manager(EmpInfo),members(List<EmpInfo>)
-    /*
-    1.manager see his dept staff list -- (List<EmpInfo>) needed based on title
-    2.manager nominates two staff -- Nomination dto//award service
-
-    3.jewel on crown -- whole dept (dept-id) -- needed all depts list(List<DeptShortInfo>)
-     */
 }

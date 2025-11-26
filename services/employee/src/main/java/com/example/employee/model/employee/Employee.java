@@ -24,12 +24,10 @@ public class Employee {
     private Integer id;
 
     private String empName;
-
     private String firstName;
-
     private String lastName;
-
     private String uuid;
+    private String email;
 
     @ManyToOne
     @JoinColumn(name="department_id")

@@ -1,6 +1,8 @@
 package com.example.employee.model.department;
 
+import com.example.employee.mapper.EmpInfoMapper;
 import com.example.employee.model.employee.Employee;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -8,7 +10,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class DepartmentDtoMapper {
+
+    private final EmpInfoMapper empInfoMapper;
 
     public DepartmentDto getDepartmentDetails(Department department){
         DepartmentDto departmentDto = new DepartmentDto();
@@ -16,27 +21,12 @@ public class DepartmentDtoMapper {
         departmentDto.setDepartmentName(department.getDepartmentName());
 
         if(department.getManager()!=null){
-            departmentDto.setManagerDetails(getManagerDetails(department.getManager()));
+            departmentDto.setManagerDetails(empInfoMapper.getEmployeeInfo(department.getManager()));
         }
 
-        departmentDto.setDepartmentMemberDetails(department.getDeptMembers().stream().map(this::getDepartmentMemberDetails).collect(Collectors.toList()));
+        departmentDto.setDepartmentMemberDetails(department.getDeptMembers().stream().map(empInfoMapper::getEmployeeInfo).collect(Collectors.toList()));
 
         return departmentDto;
     }
 
-    private Map<String,String> getManagerDetails(Employee manager){
-        Map<String,String> managerDetails = new HashMap<>();
-        managerDetails.put("Manager Id",manager.getId().toString());
-        managerDetails.put("Manager Uuid",manager.getUuid());
-        managerDetails.put("Manager Name",manager.getEmpName());
-        return managerDetails;
-    }
-
-    private Map<String,String> getDepartmentMemberDetails(Employee employee){
-        Map<String,String> member = new HashMap<>();
-        member.put("Member Id",employee.getId().toString());
-        member.put("Member Uuid", employee.getUuid());
-        member.put("Member Name",employee.getEmpName());
-        return member;
-    }
 }

@@ -31,4 +31,8 @@ public class EntityRetrieve {
     public Team getTeamById(int id){
         return teamRepo.findById(id).orElseThrow(()->new TeamException.TeamNotFoundException("Team not found"));
     }
+
+    public Employee getEmployeeByUuid(String empUuid){
+        return employeeRepo.findByUuid(empUuid).orElseThrow(()->new EmployeeException.EmpNotFoundException("Employee Not found"));
+    }
 }
