@@ -1,0 +1,23 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+
+      routes:
+        - id: employee-service
+          uri: lb:http://EMPLOYEE-SERVICE
+          predicates:
+            - Path=/v1/employees/**, /v1/department/**, /v1/teams/**
+        - id: award-service
+          uri: lb:http://AWARD-SERVICE
+          predicates:
+            - Path=/v1/award/**
+        - id: goody-service
+          uri: lb:http://GOODY-SERVICE
+          predicates:
+            - Path=/v1/goody/**
+
+server:
+  port: ${GATEWAY_SERVICE_PORT}

@@ -1,0 +1,325 @@
+
+services:
+  config-server:
+    build:
+      context: ./services/config-server
+      dockerfile: Dockerfile
+    #container_name: config-server
+    env_file:
+      - .env.demo
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+    ports:
+      - "${CONFIG_SERVER_PORT}:${CONFIG_SERVER_PORT}"
+    networks:
+      - demo-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+
+  discovery-service:
+    build:
+      context: ./services/discovery
+      dockerfile: Dockerfile
+    #container_name: discovery-service
+    env_file:
+      - .env.demo
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      SPRING_CONFIG_IMPORT: ${CONFIGURATION_IMPORT}
+    ports:
+      - "${DISCOVERY_SERVICE_PORT}:${DISCOVERY_SERVICE_PORT}"
+    networks:
+      - demo-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+
+  keycloak-database:
+    image: postgres:${POSTGRES_VERSION}
+    #container_name: keycloak-database
+    environment:
+      POSTGRES_DB: ${KC_DB_URL_DATABASE}
+      POSTGRES_USER: ${KC_DB_USERNAME}
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
+    ports:
+      - "${KC_DB_URL_PORT}:5432"
+    volumes:
+      - keycloak_postgres_demo:/var/lib/postgresql/data
+    networks:
+      - demo-network
+    restart: unless-stopped
+
+  keycloak-service:
+    #container_name: keycloak-service
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
+
+    # Runs Quarkus Keycloak
+    command: >
+      start
+      --http-enabled=true
+      --import-realm
+
+    environment:
+      # Database connection
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak-database
+      KC_DB_URL_DATABASE: ${KC_DB_URL_DATABASE}
+      KC_DB_USERNAME: ${KC_DB_USERNAME}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KC_LOG_LEVEL: org.keycloak.services:DEBUG
+
+      KC_HTTP_ENABLED: "true"
+
+      # Hostname settings
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
+      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+
+      # Admin credentials
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+
+      # For Admin Console
+      #KC_HOSTNAME_ADMIN: localhost
+      KC_HOSTNAME_ADMIN_URL: http://localhost:8080
+
+    ports:
+      - "${KEYCLOAK_HTTP_PORT}:8080"
+
+    volumes:
+      # Realm import JSONv
+      - ./keycloak-import:/opt/keycloak/data/import:ro
+
+    networks:
+      - demo-network
+    depends_on:
+      - keycloak-database
+    restart: unless-stopped
+
+  pgadmin:
+    #container_name: pdadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin_demo:/var/lib/pgadmin
+    ports:
+      - "${PGADMIN_PORT}:80"
+    networks:
+      - demo-network
+    restart: unless-stopped
+
+  employee-db-service:
+    #container_name: employee-db-service
+    image: postgres:${POSTGRES_VERSION}
+    environment:
+      POSTGRES_DB: ${EMPLOYEE_DB}
+      POSTGRES_USER: ${EMPLOYEE_DB_USER}
+      POSTGRES_PASSWORD: ${EMPLOYEE_DB_PASSWORD}
+    volumes:
+      - employee_postgres_demo:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U emp_user -d employee_database" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "${EMPLOYEE_DB_PORT}:5432"
+    networks:
+      - demo-network
+    restart: unless-stopped
+
+  employee-service:
+    build:
+      context: ./services/employee
+      dockerfile: Dockerfile
+    #container_name: employee-service
+    env_file:
+      - .env.demo
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      SPRING_CONFIG_IMPORT: ${CONFIGURATION_IMPORT}
+    command: ["sh", "-c", "sleep 20 && java -jar target/*.jar"]
+    ports:
+      - "${EMPLOYEE_SERVICE_PORT}:${EMPLOYEE_SERVICE_PORT}"
+    networks:
+      - demo-network
+    depends_on:
+      employee-db-service:
+        condition: service_healthy
+
+  award-db-service:
+    #container_name: award-db-service
+    image: postgres:${POSTGRES_VERSION}
+    environment:
+      POSTGRES_DB: ${AWARD_DB}
+      POSTGRES_USER: ${AWARD_DB_USER}
+      POSTGRES_PASSWORD: ${AWARD_DB_PASSWORD}
+    volumes:
+      - award_postgres_demo:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U award_user -d award_database" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "${AWARD_DB_PORT}:5432"
+    networks:
+      - demo-network
+    restart: unless-stopped
+
+  award-service:
+    build:
+      context: ./services/award
+      dockerfile: Dockerfile
+    #container_name: award-service
+    env_file:
+      - .env.demo
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      SPRING_CONFIG_IMPORT: ${CONFIGURATION_IMPORT}
+    command: [ "sh", "-c", "sleep 20 && java -jar target/*.jar" ]
+    ports:
+      - "${AWARD_SERVICE_PORT}:${AWARD_SERVICE_PORT}"
+    networks:
+      - demo-network
+    depends_on:
+      award-db-service:
+        condition: service_healthy
+
+  goody-db-service:
+    #container_name: goody-db-service
+    image: postgres:${POSTGRES_VERSION}
+    environment:
+      POSTGRES_DB: ${GOODY_DB}
+      POSTGRES_USER: ${GOODY_DB_USER}
+      POSTGRES_PASSWORD: ${GOODY_DB_PASSWORD}
+    volumes:
+      - goody_postgres_demo:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U goody_user -d goody_database" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "${GOODY_DB_PORT}:5432"
+    networks:
+      - demo-network
+    restart: unless-stopped
+
+  goody-service:
+    build:
+      context: ./services/goody
+      dockerfile: Dockerfile
+    #container_name: goody-service
+    env_file:
+      - .env.demo
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      SPRING_CONFIG_IMPORT: ${CONFIGURATION_IMPORT}
+    command: [ "sh", "-c", "sleep 20 && java -jar target/*.jar" ]
+    ports:
+      - "${GOODY_SERVICE_PORT}:${GOODY_SERVICE_PORT}"
+    networks:
+      - demo-network
+    depends_on:
+      goody-db-service:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: ./services/notification
+      dockerfile: Dockerfile
+    #container_name: notification-service
+    env_file:
+      - .env.demo
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      SPRING_CONFIG_IMPORT: ${CONFIGURATION_IMPORT}
+    command: [ "sh", "-c", "sleep 40 && java -jar target/*.jar" ]
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT}:${NOTIFICATION_SERVICE_PORT}"
+    depends_on:
+      - mail-dev
+    networks:
+      - demo-network
+
+  gateway-service:
+    build:
+      context: ./services/gateway
+      dockerfile: Dockerfile
+    #container_name: gateway-service
+    env_file:
+      - .env.demo
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      SPRING_CONFIG_IMPORT: ${CONFIGURATION_IMPORT}
+    command: [ "sh", "-c", "sleep 20 && java -jar target/*.jar" ]
+    ports:
+      - "${GATEWAY_SERVICE_PORT}:${GATEWAY_SERVICE_PORT}"
+    networks:
+      - demo-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    hostname: kafka
+    #container_name: kafka
+    ports:
+      - "${KAFKA_PORT}:${KAFKA_PORT}"
+    environment:
+      CLUSTER_ID: "${KAFKA_CLUSTER_UUID}"
+      # ---- KRaft core ----
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+
+      # ---- Listeners ----
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      # ---- Single-node safety ----
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+      # ---- Disable ZooKeeper explicitly ----
+      KAFKA_ZOOKEEPER_CONNECT: ""
+
+    volumes:
+      - kafka_data_demo:/var/lib/kafka/data
+
+    networks:
+      - demo-network
+
+  mail-dev:
+    #container_name: mail-dev-demo
+    image: maildev/maildev
+    ports:
+      - "${MAIL_DEV_UI}:1080"
+      - "${MAIL_DEV_SERVICE_PORT}:1025"
+    networks:
+      - demo-network
+
+networks:
+  demo-network:
+    driver: bridge
+
+volumes:
+  keycloak_postgres_demo:
+  pgadmin_demo:
+  employee_postgres_demo:
+  award_postgres_demo:
+  goody_postgres_demo:
+  kafka_data_demo:
+  #zookeeper_data_demo:

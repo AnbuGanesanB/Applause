@@ -1,0 +1,7 @@
+eureka:
+  instance:
+    #hostname: "${DISCOVERY_SERVICE_HOST}"
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: "${DISCOVERY_SERVICE_URL}"

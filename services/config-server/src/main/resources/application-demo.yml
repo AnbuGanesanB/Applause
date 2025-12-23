@@ -1,7 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: demo
 
   cloud:
     config:
@@ -9,7 +9,7 @@ spring:
         git:
           uri: ""
         native:
-          search-locations: file:config-repo
+          search-locations: classpath:/config
 
 server:
-  port: 8888
+  port: "${CONFIG_SERVER_PORT}"
