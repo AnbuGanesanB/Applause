@@ -1,0 +1,44 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "${KEYCLOAK_TOKEN_ISSUER_URI}"
+  datasource:
+    url: "${GOODY_SERVICE_DB_URL}"
+    username: ${GOODY_DB_USER}
+    password: ${GOODY_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      data-source-properties:
+        serverTimezone: UTC
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  jackson:
+    time-zone: UTC
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+    baseline-description: "init"
+    baseline-version: 0
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    locations: classpath:db/migration
+  kafka:
+    bootstrap-servers: "${KAFKA_SERVER}"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true
+
+server:
+  port: ${GOODY_SERVICE_PORT}

@@ -1,0 +1,66 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: ${EMPLOYEE_SERVICE_CLIENT_ID}
+            client-secret: ${EMPLOYEE_SERVICE_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+            provider: keycloak
+        provider:
+          keycloak:
+            issuer-uri: "${KEYCLOAK_TOKEN_ISSUER_URI}"
+
+      resourceserver:
+        jwt:
+          issuer-uri: "${KEYCLOAK_TOKEN_ISSUER_URI}"
+
+  datasource:
+    url: "${EMPLOYEE_SERVICE_DB_URL}"
+    username: ${EMPLOYEE_DB_USER}
+    password: ${EMPLOYEE_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      data-source-properties:
+        serverTimezone: UTC
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  jackson:
+    time-zone: UTC
+
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+    baseline-description: "init"
+    baseline-version: 0
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    locations: classpath:db/migration
+
+  kafka:
+    bootstrap-servers: "${KAFKA_SERVER}"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.type.mapping: empInfo:com.example.employee.dtos.EmpInfo
+
+server:
+  port: "${EMPLOYEE_SERVICE_PORT}"
+
+keycloak:
+  base-url: "${KEYCLOAK_BASE_URL}"
+  realm: ${KEYCLOAK_DEMO_REALMNAME}
+  client-id: ${EMPLOYEE_SERVICE_CLIENT_ID}
+  client-secret: ${EMPLOYEE_SERVICE_CLIENT_SECRET}

@@ -1,0 +1,13 @@
+server:
+  port: ${DISCOVERY_SERVICE_PORT}
+
+spring:
+  cloud:
+    config:
+      enabled: true
+      override-system-properties: false
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false

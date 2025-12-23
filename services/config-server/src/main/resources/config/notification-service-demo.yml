@@ -1,0 +1,29 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          notification-service:
+            client-id: ${NOTIFICATION_SERVICE_CLIENT_ID}
+            client-secret: ${NOTIFICATION_SERVICE_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+            provider: keycloak
+        provider:
+          keycloak:
+            token-uri: "${KEYCLOAK_TOKEN_URI}"
+            #issuer-uri: "${KEYCLOAK_TOKEN_ISSUER_URI}"
+  kafka:
+    bootstrap-servers: "${KAFKA_SERVER}"
+
+  mail:
+    host: mail-dev
+    port: 1025
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 3000
+      mail.smtp.writetimeout: 5000
+
+server:
+  port: ${NOTIFICATION_SERVICE_PORT}
