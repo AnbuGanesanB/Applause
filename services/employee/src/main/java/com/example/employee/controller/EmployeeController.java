@@ -23,7 +23,7 @@ public class EmployeeController {
     private final EntityRetrieve entityRetrieve;
 
     @PreAuthorize("hasRole('hr')")
-    @GetMapping("/sync")
+    @GetMapping("/employees/sync")
     public void syncUsersFromKeycloak(){
         employeeService.syncUsersFromKeycloak();
     }
