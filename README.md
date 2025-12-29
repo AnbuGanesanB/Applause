@@ -5,7 +5,24 @@ Spring Boot, Kafka, Keycloak, and Docker Compose.
 
 ---
 
-## Overview
+## 📑 Table of Contents
+
+1. [x] [Overview](#overview)
+2. [x] [Architecture](#architecture)
+3. [x] [Tech Stack](#tech-stack)
+4. [x] [Running the Project](#run)
+5. [x] [security](#security)
+6. [x] [Combined ERD Data Model](#db-design)
+7. [x] [Overall System Design](#system-design)
+8. [x] [Event Driven Flow](#ED-flow)
+8. [x] [API Documentation](#api-documentation)
+9. [x] [Future Scope](#future-scope)
+10. [x] [Contribution](#contribution)
+11. [x] [License](#license)
+
+---
+
+<h2 id="overview">Overview</h2>
 
 Applause is a complete rewards & goodies platform for corporate
 employees. Employees earn points through awards and redeem those points
@@ -18,7 +35,7 @@ Docker Compose for orchestration
 
 ---
 
-## Architecture
+<h2 id="architecture">Architecture</h2>
 
 ### Core Domain Services
 
@@ -35,7 +52,7 @@ Docker Compose for orchestration
 
 - Manages Different Award Types
 - Grants awards with points
-- Manages Award Distribution data on each award
+- Manages Award Distribution data upon Award being granted
 - Publishes AwardGrantedEvent for Individual, Team, Department awards to Kafka
 
 #### 3. Goody Service
@@ -45,17 +62,22 @@ Docker Compose for orchestration
 - Manages Goody Distribution data and its status
 - Publishes OrderPlaced, OrderCancelled, OrderDelivered events to Kafka
 
+#### 4. Notification Service
+
+- Event Driven system, powered by Kafka
+- For sending Mail Notifications upon events mentioned from Award, Goody service.
+- Future Scope: Shall have persistent Data for Mail resend and remainder mails, etc.
+
 ### Supporting Services
 
-- Notification Service (Kafka → Email)
+- Keycloak Authentication Server
 - API Gateway
 - Eureka Discovery Server
 - Config Server
-- Keycloak Authentication Server
 
 ---
 
-## Tech Stack
+<h2 id="tech-stack">Tech Stack</h2>
 
 - Java 17 / Spring Boot
 - Spring Cloud (Gateway, Config, Eureka Discovery)
@@ -65,32 +87,95 @@ Docker Compose for orchestration
 - PostgreSQL
 - Docker Compose
 
-## Running the Project
+<h2 id="run">Running the Project</h2>
+
+- Project can be run using Docker.
+- To Run this Project locally, separate DEMO environment is configured.
+- Before starting, Please ensure below mentioned Access Points are available and not busy.
 
 ### 1. Clone the Repo
 
-    git clone https://github.com/your-username/applause.git
-    cd applause
+    git clone https://github.com/AnbuGanesanB/Applause.git
+    cd Applause
 
-### 2. Start All Services
+### 2. Verify necessary files exist
 
-    docker compose up --build
+- Ensure '.env.demo' ENV file is present
+- Inside there must be a variable (COMPOSE_PROJECT_NAME=applause-demo). 
+- Verify Keycloak import files exist (keycloak-import/Realm_Study-realm.json & keycloak-import/Realm_Study-users-0.json)
+- Above files are important to import pre-configured Keycloak Realm
 
-### 3. Access Points
+### 3. Ensure Clean docker state
 
-- Eureka: http://localhost:8761/
-- Keycloak Admin: http://localhost:8080/
+    docker compose --env-file .env.demo -f docker-compose-demo.yml down -v
+
+### 4. Start the demo stack
+
+    docker compose --env-file .env.demo -f docker-compose-demo.yml up -d
+- wait for 8-10 mins depending on machine's capacity to ensure all the services are up and running.
+- Services must be running in below mentioned ports.
+
+### 5. Access Points (Configured in DEMO env)
+
+- Gateway Server: http://localhost:8222
+- Config Server: http://localhost:8888
+- Keycloak Admin: http://localhost:8080
+- Eureka: http://localhost:8761
+- Employee Service: http://localhost:8050 
+- Award Service: http://localhost:8060
+- Goody Service: http://localhost:8070
+- Notification Service: http://localhost:8040
+- PG Admin: http://localhost:5050 (shall configure running DB and view)
+- Mail Dev Service: http://localhost:1025 (Intercepts Mail)
+- Mail Dev UI: http://localhost:1080 (To check Mail)
+
+### 6. Access the Keycloak 
+
+- Username: admin
+- Password: admin
+
+Verify the following:
+
+- Realm Realm_Study exists
+- Users are present
+- Clients exist
+- Client secrets are same as mentioned in '.env.demo'
+
+### 7. Configure OAuth2.0 Token
+
+Preferably send as Request Header with Prefix 'Bearer'
+
+#### As User: (To access resource server APIs like Employee,Award,Goodies)
+
+- Grant Type: Password Credentials
+- Access Token URL: http://localhost:8080/realms/Realm_Study/protocol/openid-connect/token
+- Client ID: employee_service
+- Client Secret: imBdba5w1MBmlarVqRP6ywtxX5gbCW1c (crosscheck with keycloak directly)
+- Username: alice (Or any other user)
+- Password: alice (password same as username)
+
+#### As Service: (To access Keycloak APIs directly)
+
+- Grant Type: Client Credentials
+- Access Token URL: http://localhost:8080/realms/Realm_Study/protocol/openid-connect/token
+- Client ID: employee_service
+- Client Secret: imBdba5w1MBmlarVqRP6ywtxX5gbCW1c (crosscheck with keycloak directly)
+
+### 9. Shutdown all services
+
+    docker compose --env-file .env.demo -f docker-compose-demo.yml down
 
 ---
 
-## Security
+<h2 id="security">Security</h2>
 
-Authentication via Keycloak with JWT-based RBAC: - ROLE_EMPLOYEE -
-ROLE_HR - ROLE_ADMIN
+Authentication via Keycloak with JWT-based RBAC: 
+- Roles defined in Auth-server: (hr / manager / staff)
+- An Employee/User must always be in any one of above listed roles
 
 ---
 
-## Database Design (Combined ER Diagrams)
+<h2 id="db-design">Database Design (Combined ER Diagrams)</h2>
 
 Application follows DB per service design.
 
@@ -191,7 +276,7 @@ erDiagram
 
 ---
 
-## Overall System Architecture Diagram
+<h2 id="system-design">Overall System Architecture Diagram</h2>
 
 config:
 layout: elk
@@ -241,7 +326,7 @@ CONFIG --> ES & AS & GS & NS
 
 ---
 
-## Event-Driven Flow (Kafka)
+<h2 id="ED-flow">Event-Driven Flow (Kafka)</h2>
 
 | Event Name                | Produced By      | Consumed By                   | Purpose                                    |
 | ------------------------- | ---------------- | ----------------------------- | ------------------------------------------ |
@@ -256,29 +341,29 @@ CONFIG --> ES & AS & GS & NS
 
 ---
 
-## API Documentation
+<h2 id="api-documentation">API Documentation</h2>
 
 👉 [View API Documentation](https://documenter.getpostman.com/view/47323157/2sB3dPQpWD)
 
 ---
 
-## Future Enhancements
+<h2 id="future-scope">Future Enhancements</h2>
 
 - Add distributed tracing (Zipkin/OpenTelemetry)
 - Add Grafana & Prometheus monitoring
 - Add Admin UI (Angular/React)
 - Add Frontend dashboard for all staffs (Angular/React)
 - Add DLQ handling for Kafka
-- Persistance layer for Notification service to process Mail Resend, follow-up mails, remainder mails etc
+- Persistence layer for Notification service to process Mail Resend, follow-up mails, remainder mails etc
 
 ---
 
-<h2 id="contribution">🙌 Contribution</h2>
+<h2 id="contribution">Contribution</h2>
 
 This is a personal project meant for learning and showcasing skills, but feel free to fork and experiment.
 
 ---
 
-<h2 id="license">📄 License</h2>
+<h2 id="license">License</h2>
 
 MIT — Free to use for personal and professional demos.
